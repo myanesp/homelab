@@ -1,0 +1,27 @@
+version: "3"
+services:
+  wsgidav:
+    container_name: wsgidav
+    build: .
+    ports:
+      - 10280:8080
+    restart: unless-stopped
+    environment:
+      - com.centurylinklabs.watchtower.enable=false
+    volumes:
+#      - /mnt/hdd:/var/wsgidav-root
+#      - /mnt/tmp:/var/wsgidav-root/tmp
+      - /mnt/:/var/wsgidav-root/
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.webdav.entrypoints=websecure"
+      - "traefik.http.services.webdav.loadbalancer.server.port=8080"
+      - "traefik.http.routers.webdav.rule=Host(`domain.duckdns.org`)"
+      - "traefik.http.routers.webdav.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.webdav.middlewares=dashboard-auth"
+
+networks:
+  default:
+    external: true
+    name: traefik
+
