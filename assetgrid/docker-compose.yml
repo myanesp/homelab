@@ -1,0 +1,14 @@
+version: "3.1"
+services:
+  assetgrid:
+    image: assetgrid/assetgrid
+    container_name: assetgrid
+    volumes:
+      - ./config:/usr/share/assetgrid/assetgrid_data
+    ports:
+      - 8464:8080
+
+networks:
+  default:
+    name: lan
+    external: true
