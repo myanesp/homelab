@@ -1,0 +1,26 @@
+version: '3.3'
+services:
+  rstudio:
+    ports:
+      - '8787:8787'
+    container_name: rstudio_server
+    volumes:
+      - './packages/:/packages'
+      - '/the/path/to/the/files:/home/rstudio/work'
+    environment:
+      - PASSWORD=password
+      - USERID=1000
+      - GROUPID=1000
+    image: 'davetang/rstudio:4.2.2'
+    labels:
+      - "traefik.http.routers.rstudio.middlewares=authelia"
+      - "traefik.enable=true"
+      - "traefik.http.services.rstudio.loadbalancer.server.port=8787"
+      - "traefik.http.routers.rstudio.rule=Host(`rstudio.domain.coms`)"
+      - "traefik.http.routers.rstudio.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.rstudio.entrypoints=websecure"
+
+networks:
+  default:
+    external: true
+    name: traefik

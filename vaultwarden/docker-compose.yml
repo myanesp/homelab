@@ -1,0 +1,27 @@
+version: '2'
+
+services:
+  vaultwarden:
+    image: vaultwarden/server:1.25.2
+    container_name: vaultwarden
+    environment:
+      - SIGNUPS_ALLOWED=false
+      - INVITATIONS_ALLOWED=false
+    volumes:
+      - ./data:/data
+    ports:
+      - 88:80
+      - 3012:3012
+    restart: always
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.vault.entrypoints=websecure"
+      - "traefik.http.services.vault.loadbalancer.server.port=80"
+      - "traefik.http.routers.vault.rule=Host(`domain.ltd.es`)"
+      - "traefik.http.routers.vault.tls.certresolver=dondom"
+      - "traefik.http.routers.vault.middlewares=security-headers"
+
+networks:
+  default:
+    external: true
+    name: traefik
