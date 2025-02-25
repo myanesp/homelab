@@ -1,0 +1,48 @@
+services:
+  nextcloud:
+    image: nextcloud:latest
+    restart: always
+    ports:
+      - 8089:80
+    environment:
+      - MYSQL_HOST=mariadb
+      - MYSQL_DATABASE=nextcloud
+      - MYSQL_USER=nextcloud
+      - MYSQL_PASSWORD=nextcloud
+    volumes:
+      - ./config:/var/www/html
+    container_name: nextcloud
+    depends_on:
+      - mariadb
+
+  mariadb:
+    image: mariadb:11.6
+    restart: always
+    environment:
+      - MYSQL_DATABASE=nextcloud
+      - MYSQL_USER=nextcloud
+      - MYSQL_PASSWORD=nextcloud
+      - MYSQL_ROOT_PASSWORD=root_password
+    volumes:
+      - ./db:/var/lib/mysql
+
+  office:
+    image: collabora/code
+    container_name: office
+    environment:
+      - VIRTUAL_PROTO=http
+      - VIRTUAL_PORT=9980
+      - VIRTUAL_HOST=office.domain.com
+      - "extra_params=--o:ssl.enable=false  --o:ssl.termination=true"
+      - domain=cloud\.domain\.com
+      - dictionaries=en es
+    restart: always
+    ports:
+      - 9980:9980
+    cap_add:
+      - MKNOD
+
+networks:
+  default:
+    external: true
+    name: traefik
